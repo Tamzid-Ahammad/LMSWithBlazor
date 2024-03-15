@@ -1,0 +1,169 @@
+﻿@page "/edit/{stuId:int}"
+@rendermode InteractiveWebAssembly
+@inject BookService service
+@inject NavigationManager nav
+@inject IJSRuntime JS
+
+<h3>StudentEdit</h3>
+
+<EditForm Model="model" OnValidSubmit="SaveData">
+	<DataAnnotationsValidator/>
+	<ValidationSummary/>
+
+	<div>
+		<label for="name">Student Name :</label>
+		<InputText id="name" class="form-control" required @bind-Value="model.StudentName" />
+		<ValidationMessage For="()=> model.StudentName" />
+	</div>
+	<div>
+		<label for="name">Student Address :</label>
+		<InputTextArea id="name" class="form-control" required @bind-Value="model.Address" />
+		<ValidationMessage For="()=> model.Address" />
+	</div>
+
+	<div>
+		<label for="name">Email :</label>
+		<InputText id="name" class="form-control" required @bind-Value="model.Email" />
+		<ValidationMessage For="()=> model.Email" />
+	</div>
+
+	<div>
+		<label for="name">Phone :</label>
+		<InputText id="name" class="form-control" required @bind-Value="model.Phone" />
+		<ValidationMessage For="()=> model.Phone" />
+	</div>
+
+
+	<table class="table table-active table-bordered table-hover">
+
+		<tr>
+			<th>Book Title </th>
+			<th>Author Name</th>
+			<th>Available?</th>
+			<th>Rent Price</th>
+			<th>Book Borrowing Date</th>
+			<th>Book Returning Date</th>
+			<th>Book Returning Time In Days</th>
+			<th>
+				<button type="button" class="btn btn-outline-info" @onclick="AddBook">Add Book</button>
+			</th>
+		</tr>
+
+		@foreach (var book in model.Books)
+		{
+			<tr>
+				<td>
+					<InputText class="form-control" @bind-Value="book.BookTitle" />
+					<ValidationMessage For="()=>book.BookTitle" />
+				</td>
+				<td>
+					<InputText class="form-control" @bind-Value="book.AuthorName" />
+					<ValidationMessage For="()=> book.AuthorName" />
+				</td>
+				<td>
+					<InputCheckbox @bind-Value="book.Available" />
+					<ValidationMessage For="()=> book.Available" />
+				</td>
+				<td>
+					<InputNumber class="form-control" @bind-Value="book.RentPrice" />
+					<ValidationMessage For="()=> book.RentPrice" />
+				</td>
+				<td>
+					<InputDate @bind-Value="book.BookBorrowingDate" />
+					<ValidationMessage For="()=> book.BookBorrowingDate" />
+				</td>
+				<td>
+					<InputDate @bind-Value="book.BookReturningDate" />
+					<ValidationMessage For="()=> book.BookReturningDate" />
+				</td>
+
+				<td>
+
+					<ValidationMessage For="()=> book.BookReturningTimeInDays" />
+				</td>
+
+				<td>
+					<button type="button" class="btn btn-outline-warning" @onclick="()=> DeleteBook(book)">Delete</button>
+				</td>
+			</tr>
+		}
+
+
+
+
+
+	</table>
+
+
+	<button type="submit" class="btn btn-outline-success">
+		Save
+	</button>
+
+	<button type="button" class="btn btn-outline-danger" @onclick="StudentDelete">
+		Delete
+	</button>
+
+	<NavLink class="btn btn-outline-info" href="stu">
+		Cancel
+	</NavLink>
+
+
+
+
+
+
+</EditForm>
+
+
+@code {
+	[Parameter]
+	public int stuId { get; set; }
+
+
+	private Student model = new Student();
+
+
+
+	protected override async Task OnInitializedAsync()
+	{
+
+		this.model = await this.service.GetById(stuId);
+
+		await base.OnInitializedAsync();
+	}
+
+
+
+	public async Task SaveData()
+	{
+		var response = await service.Update(model);
+
+		if (response.IsSuccessStatusCode)
+		{
+			nav.NavigateTo("/stu");
+		}
+
+
+	}
+
+	void AddBook()
+	{
+		model.Books?.Add(new Book());
+	}
+	void DeleteBook(Book item)
+	{
+		model.Books?.Remove(item);
+
+	}
+
+	async Task StudentDelete()
+	{
+		var response = await service.Delete(stuId);
+
+		if (response.IsSuccessStatusCode)
+		{
+			nav.NavigateTo("/stu");
+		}
+
+	}
+}

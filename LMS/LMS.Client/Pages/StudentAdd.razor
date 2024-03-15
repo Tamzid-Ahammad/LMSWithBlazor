@@ -1,0 +1,155 @@
+﻿@page "/add"
+@rendermode InteractiveWebAssembly
+@inject BookService service
+@inject NavigationManager nav
+
+<h3>StudentAdd</h3>
+
+<EditForm Model="model" OnValidSubmit="SaveData" >
+	<DataAnnotationsValidator></DataAnnotationsValidator>
+	<ValidationSummary/>
+	@if (!string.IsNullOrEmpty(message))
+	{
+		<span class="text-danger text-lg-center">@message</span>
+	}
+
+
+	<div>
+		<label for="name">Student Name :</label>
+		<InputText id="name" class="form-control" required @bind-Value="model.StudentName" />
+		<ValidationMessage For="()=> model.StudentName" />
+	</div>
+
+	<div>
+		<label for="name">Student Address :</label>
+		<InputTextArea id="name" class="form-control" required @bind-Value="model.Address" />
+		<ValidationMessage For="()=> model.Address" />
+	</div>
+
+	<div>
+		<label for="name">Email :</label>
+		<InputText id="name" class="form-control" required @bind-Value="model.Email" />
+		<ValidationMessage For="()=> model.Email" />
+	</div>
+
+	<div>
+		<label for="name">Phone :</label>
+		<InputText id="name" class="form-control" required @bind-Value="model.Phone" />
+		<ValidationMessage For="()=> model.Phone" />
+	</div>
+
+
+	<table class="table table-active table-bordered table-hover" >
+
+		<tr>
+			<th>Book Title </th>
+			<th>Author Name</th>
+			<th>Available?</th>
+			<th>Rent Price</th>
+			<th>Book Borrowing Date</th>
+			<th>Book Returning Date</th>
+			<th>Book Returning Time In Days</th>
+			<th>
+				<button type="button" class="btn btn-outline-info" @onclick="AddBook">Add book</button>
+			</th>
+		</tr>
+
+		@foreach (var book in model.Books)
+		{
+			<tr>
+				<td>
+					<InputText class="form-control" @bind-Value="book.BookTitle" />
+					<ValidationMessage For="()=>book.BookTitle" />
+				</td>
+				<td>
+					<InputText class="form-control" @bind-Value="book.AuthorName" />
+					<ValidationMessage For="()=> book.AuthorName" />
+				</td>
+				<td>
+					<InputCheckbox @bind-Value="book.Available" />
+					<ValidationMessage For="()=> book.Available" />
+				</td>
+				<td>
+					<InputNumber class="form-control" @bind-Value="book.RentPrice" />
+					<ValidationMessage For="()=> book.RentPrice" />
+				</td>
+				<td>
+					<InputDate @bind-Value="book.BookBorrowingDate" />
+					<ValidationMessage For="()=> book.BookBorrowingDate" />
+				</td>
+				<td>
+					<InputDate @bind-Value="book.BookReturningDate" />
+					<ValidationMessage For="()=> book.BookReturningDate" />
+				</td>
+
+				<td>
+					
+					<ValidationMessage For="()=> book.BookReturningTimeInDays" />
+				</td>
+
+				<td>
+					<button type="button" class="btn btn-outline-warning" @onclick="()=> DeleteBook(book)">Delete</button>
+				</td>
+			</tr>
+		}
+
+
+
+
+
+	</table>
+
+
+	<button type="submit" class="btn btn-outline-success">
+		Save
+	</button>
+	<NavLink class="btn btn-outline-info" href="stu">
+		Cancel
+	</NavLink>
+
+</EditForm>
+
+
+
+
+
+
+
+@code {
+    private Student model = new Student();
+
+    int index = 0;
+    string? message;
+	public async Task SaveData()
+	{
+		var response = await service.Save(model);
+
+		if (response.IsSuccessStatusCode)
+		{
+			nav.NavigateTo("/stu");
+		}
+		else
+		{
+			this.message = response.ReasonPhrase;
+			
+		}
+	}
+
+
+	private void AddBook()
+	{
+		model.Books?.Add(new Book());
+	}
+	private void DeleteBook(Book item)
+	{
+		model.Books?.Remove(item);
+
+	}
+
+
+
+
+
+
+
+}
