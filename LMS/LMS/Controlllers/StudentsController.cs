@@ -100,19 +100,42 @@ namespace LMS.Controlllers
         }
 
         // DELETE: api/ProductCategories/5
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteStudent(int id)
+        //{
+        //    var Student = await _context.Students.FindAsync(id);
+        //    if (Student == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    _context.Students.Remove(Student);
+        //    await _context.SaveChangesAsync();
+
+        //    return NoContent();
+        //}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteStudent(int id)
         {
-            var Student = await _context.Students.FindAsync(id);
-            if (Student == null)
+            try
             {
-                return NotFound();
+                var student = await _context.Students.FindAsync(id);
+
+                if (student == null)
+                {
+                    return NotFound("Student not found.");
+                }
+                var relatedBooks = _context.Books.Where(b => b.StudentId == id);
+                _context.Books.RemoveRange(relatedBooks);
+                _context.Students.Remove(student);
+                await _context.SaveChangesAsync();
+
+                return NoContent();
             }
-
-            _context.Students.Remove(Student);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error deleting student: {ex.Message}");
+            }
         }
 
         private bool StudentExists(int id)

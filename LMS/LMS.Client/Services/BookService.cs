@@ -9,7 +9,7 @@ namespace LMS.Client.Services
     {
         private readonly HttpClient http;
 
-        private string apiLink = "/api/ProductCategories";
+        private string apiLink = "/api/Students";
 
         public BookService(HttpClient http, NavigationManager nav)
         {
